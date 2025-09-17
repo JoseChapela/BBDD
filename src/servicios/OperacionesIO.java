@@ -13,7 +13,30 @@ public class OperacionesIO {
     public static void main(String[] args)
             throws DirectorioNoExisteException, NoEsDirectorioException {
         //recorrerRecursivo("C:\\Users\\josec\\Desktop\\prueba");
-        filtrarPorExtensionYOrdenar("C:\\Users\\josec\\Documents\\Wallpaper",".jpg",true);
+        //filtrarPorExtensionYOrdenar("C:\\Users\\josec\\Documents\\Wallpaper",".jpg",true);
+        List<File> lista = filtrarPorSubcadena("C:\\Users\\josec\\Documents\\Wallpaper","ca");
+        for (File file : lista) {
+            mostrarInformacionFichero(file);
+        }
+    }
+
+    public static List<File> filtrarPorSubcadena (String ruta, String subcadena) throws DirectorioNoExisteException, NoEsDirectorioException {
+        File file = new File(ruta);
+        Utilidades.esDirectorio(file);
+        File[] files = file.listFiles((dir, name) ->new File(dir, name).isDirectory() || name.toLowerCase().contains(subcadena.toLowerCase()));
+        List<File> lista = new ArrayList<>();
+        for (File f : files) {
+            if (!f.isDirectory())
+                lista.add(f);
+            else
+                lista.addAll(filtrarPorSubcadena(f.getPath(), subcadena));
+        }
+        return lista;
+    }
+
+    public static void filtrarPorSubcadenaAux (String ruta, String subcadena) throws DirectorioNoExisteException, NoEsDirectorioException {
+        File file = new File(ruta);
+        Utilidades.esDirectorio(file);
     }
 
     public static void filtrarPorExtensionYOrdenar(String ruta, String extension, boolean descendente)
@@ -31,7 +54,7 @@ public class OperacionesIO {
 
     public static List<File> filtrarPorExtensionYOrdenarAux(File file, String extension)
             throws DirectorioNoExisteException, NoEsDirectorioException {
-        File[] files = file.listFiles((dir, name) -> new File(dir,name).isDirectory()||name.endsWith(extension));
+        File[] files = file.listFiles((dir, name) -> new File(dir,name).isDirectory()||name.toLowerCase().endsWith(extension.toLowerCase()));
         List<File> lista = new ArrayList<>();
         for (File f : files) {
             if (!f.isDirectory())
@@ -47,7 +70,7 @@ public class OperacionesIO {
         File file = new File(ruta);
         Utilidades.esDirectorio(file);
         System.out.println("---LISTANDO EL DIRECTORIO "+ruta+"---");
-        File[] files = file.listFiles((dir, name) -> name.endsWith(extension));
+        File[] files = file.listFiles((dir, name) -> name.toLowerCase().endsWith(extension.toLowerCase()));
         if (files == null) {
             System.out.println("Extension: "+extension);
             return;
@@ -72,7 +95,7 @@ public class OperacionesIO {
             System.out.print(sangria);
             mostrarInformacionFichero(f);
             if (f.isDirectory())
-                recorrerRecursivoAux(f, sangria+"--|");
+                recorrerRecursivoAux(f, sangria+sangria);
         }
     }
 
