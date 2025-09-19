@@ -3,7 +3,7 @@ package servicios;
 import excepciones.DirectorioNoExisteException;
 import excepciones.NoEsDirectorioException;
 
-import java.io.File;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,61 @@ public class OperacionesIO {
         }
     }
 
+    //---EJERCICIO 9---
+    public static boolean borrar(String ruta){
+
+        return true;
+    }
+
+    //---EJERCICIO 8---
+    public static boolean copiarDirectorio (String origen, String destino)
+            throws DirectorioNoExisteException, NoEsDirectorioException, IOException {
+        File fileOrigen = new File(origen);
+        File fileDestino = new File(destino);
+        Utilidades.esDirectorio(fileOrigen);
+        Utilidades.esDirectorio(fileDestino);
+
+        File[] files = fileOrigen.listFiles();
+
+        for (File file: files){
+            copiarArchivo(fileOrigen.getPath(),fileDestino.getPath());
+        }
+        return true;
+    }
+
+    //---EJERCICIO 7---
+    public static boolean moverArchivo(String origen, String destino) throws DirectorioNoExisteException, NoEsDirectorioException, IOException {
+        if (!copiarArchivo(origen, destino))
+            return false;
+        return new File(origen).delete();
+    }
+
+    //---EJERCICIO 6---
+    public static boolean copiarArchivo(String origen, String destino)
+            throws DirectorioNoExisteException, NoEsDirectorioException, IOException {
+        File fileOrigen = new File(origen);
+        File fileDestino = new File(destino);
+
+        if(fileDestino.listRoots()==null || fileDestino.listRoots().length==0 || !fileOrigen.exists()){
+            return false;
+        }
+
+        fileDestino.getParentFile().mkdirs();
+
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileOrigen));
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(fileDestino))) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+        catch (IOException _) {
+        }
+        return true;
+    }
+
+    //---EJERCICIO 5---
     public static List<File> filtrarPorSubcadena (String ruta, String subcadena) throws DirectorioNoExisteException, NoEsDirectorioException {
         File file = new File(ruta);
         Utilidades.esDirectorio(file);
@@ -39,6 +94,7 @@ public class OperacionesIO {
         Utilidades.esDirectorio(file);
     }
 
+    //---EJERCICIO 4---
     public static void filtrarPorExtensionYOrdenar(String ruta, String extension, boolean descendente)
             throws DirectorioNoExisteException, NoEsDirectorioException {
         File file = new File(ruta);
@@ -65,6 +121,7 @@ public class OperacionesIO {
         return lista;
     }
 
+    //---EJERCICIO 3---
     public static void filtrarPorExtension(String ruta, String extension)
             throws DirectorioNoExisteException, NoEsDirectorioException {
         File file = new File(ruta);
@@ -72,7 +129,7 @@ public class OperacionesIO {
         System.out.println("---LISTANDO EL DIRECTORIO "+ruta+"---");
         File[] files = file.listFiles((dir, name) -> name.toLowerCase().endsWith(extension.toLowerCase()));
         if (files == null) {
-            System.out.println("Extension: "+extension);
+            System.out.println("Sin resultados");
             return;
         }
 
@@ -80,12 +137,14 @@ public class OperacionesIO {
             mostrarInformacionFichero(f);
     }
 
+    //---EJERCICIO 2---
     public static void recorrerRecursivo (String ruta)
             throws DirectorioNoExisteException, NoEsDirectorioException {
+        final String sangria = "--|";
         File file = new File(ruta);
         Utilidades.esDirectorio(file);
         System.out.println("---LISTANDO EL DIRECTORIO "+ruta+"---");
-        recorrerRecursivoAux(file, "--|");
+        recorrerRecursivoAux(file, sangria);
     }
 
     private static void recorrerRecursivoAux(File file, String sangria) {
@@ -99,6 +158,7 @@ public class OperacionesIO {
         }
     }
 
+    //---EJERCICIO 1---
     public static void visualizarContenido (String ruta)
             throws DirectorioNoExisteException, NoEsDirectorioException {
         File file = new File(ruta);
@@ -112,12 +172,13 @@ public class OperacionesIO {
     }
 
     private static void mostrarInformacionFichero(File file){
+        final String FORMATO = "dd/MM/yyyy HH:mm:ss";
         String informacionFichero;
         if(file.isDirectory())
             informacionFichero = file.getName()+" <DIR> ";
         else
             informacionFichero = file.getName()+" <FICHERO> "+ NumberFormat.getInstance().format(file.length() / 1024.0) +" KB ";
-        System.out.println(informacionFichero+Utilidades.milisecToDate(file.lastModified(),"dd/MM/yyyy HH:mm:ss"));
+        System.out.println(informacionFichero+Utilidades.milisecToDate(file.lastModified(),FORMATO));
     }
 
 }
