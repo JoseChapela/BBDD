@@ -1,5 +1,6 @@
 package servicios;
 
+import excepciones.ArchivoNoExisteException;
 import excepciones.DirectorioNoExisteException;
 import excepciones.NoEsDirectorioException;
 
