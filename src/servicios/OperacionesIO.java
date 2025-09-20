@@ -1,5 +1,6 @@
 package servicios;
 
+import excepciones.ArchivoNoExisteException;
 import excepciones.DirectorioNoExisteException;
 import excepciones.NoEsDirectorioException;
 
@@ -11,18 +12,27 @@ import java.util.List;
 public class OperacionesIO {
 
     public static void main(String[] args)
-            throws DirectorioNoExisteException, NoEsDirectorioException {
+            throws DirectorioNoExisteException, NoEsDirectorioException, ArchivoNoExisteException {
         //recorrerRecursivo("C:\\Users\\josec\\Desktop\\prueba");
         //filtrarPorExtensionYOrdenar("C:\\Users\\josec\\Documents\\Wallpaper",".jpg",true);
-        List<File> lista = filtrarPorSubcadena("C:\\Users\\josec\\Documents\\Wallpaper","ca");
-        for (File file : lista) {
-            mostrarInformacionFichero(file);
-        }
+        //List<File> lista = filtrarPorSubcadena("C:\\Users\\josec\\Documents\\Wallpaper","ca");
+        borrar("C:\\Users\\josec\\Desktop\\prueba");
     }
 
     //---EJERCICIO 9---
-    public static boolean borrar(String ruta){
-
+    public static boolean borrar(String ruta)
+            throws ArchivoNoExisteException {
+        File file = new File(ruta);
+        if(!file.exists())
+            throw new ArchivoNoExisteException("No existe");
+        if (file.isFile())
+            return file.delete();
+        if (file.isDirectory()){
+            for (File f : file.listFiles()){
+                borrar(f.getAbsolutePath());
+            }
+            file.delete();
+        }
         return true;
     }
 
